@@ -1,77 +1,80 @@
-# NGO Stakeholder Stack — Toolkit
+[![CI](https://github.com/philip95macdonald-cmd/ngo-stakeholder-stack/actions/workflows/ci.yml/badge.svg)](https://github.com/philip95macdonald-cmd/ngo-stakeholder-stack/actions)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Python](https://img.shields.io/badge/python-%3E%3D3.10-blue)
 
-Ein Open-Source Python-Toolkit für die Stakeholder-Kommunikation einer NGO.
-Modulare Architektur — nimm was du brauchst. Erprobt in der Praxis, generalisiert
-für den gemeinnützigen Einsatz.
+# NGO Stakeholder Stack
 
-Komponenten: Pressekontakt-Crawler, Politik-Connector (Abgeordnetenwatch),
-Brevo-Sync, Themen-Monitor, Impact-Story-Builder.
+Open-source Python toolkit for NGO press and stakeholder communication.
+Replaces ~80% of a Meltwater or Cision subscription at zero recurring cost.
 
-## Was hier drin ist
+---
+
+## For NGO decision-makers
+
+### What it replaces
+
+| Tool | Typical cost | This stack |
+|---|---|---|
+| Meltwater (monitoring + media DB) | ~€500/month | €0 |
+| Cision (press database) | ~€300/month | €0 |
+| Brevo/Mailchimp (contacts + email) | €0–50/month | €0 (free tiers) |
+| **Total** | **~€800+/month** | **€0** |
+
+### What it does
+
+- **Finds journalists** — crawls publisher Impressum pages, extracts press contacts via NER, respects robots.txt
+- **Monitors your topics** — daily digest of news, alliances, crises, and funding opportunities across configurable sources
+- **Connects to politics** — pulls politician data from Abgeordnetenwatch (Bundestag, Landtage)
+- **Syncs contacts** — pushes your stakeholder list into Brevo, MailerLite, or CiviCRM with one command
+- **Builds impact stories** — structures beneficiary narratives into publication-ready Markdown
+
+### In 3 days you can have
+
+- Day 1: Journalist database for your beat (crawl 20–50 publishers)
+- Day 2: Daily topic monitor running on GitHub Actions (free, automated)
+- Day 3: Stakeholder list synced into your ESP, segmented by tag
+
+### Who this is for
+
+Small-to-medium NGOs with one communications person and no dedicated tech budget.
+You need basic Python skills to configure it (or a volunteer developer for initial setup).
+
+---
+
+## For developers
+
+### Architecture
 
 ```
 ngo-stakeholder-stack/
-├── README.md                  ← du bist hier
-├── QUICKSTART.md              5-Minuten-Setup für eine neue NGO
-├── docs/
-│   ├── architecture.md        Architektur-Überblick
-│   └── stakeholder-tags.md    Tag-Konvention
-├── configs/
-│   ├── ngo.example.yaml       Top-Level-Config (Name, Themen, Brand)
-│   ├── sources.example.yaml   Quellen-Listen (Medien, Politik, Förderer)
-│   └── brevo.example.yaml     Listen- und Field-Mapping
 ├── tools/
-│   ├── _shared/               Geteilte Module (HTTP, Logging, Konfig-Loader)
-│   ├── journalisten-crawler/  Pressekontakt-Crawler (Bestand, generalisiert)
-│   ├── politik-connector/     NEU: Abgeordnetenwatch + Bundestag-API
-│   ├── brevo-sync/            CSV → Brevo, Multi-Tag-Schema
-│   ├── themen-monitor/        Themen + Allianzen + Krisen + Förderer
-│   └── impact-story-builder/  NEU: Beneficiary-Stories mit Proof Chain
-├── scripts/
-│   ├── smoke.sh               End-to-End-Funktionsprüfung aller Tools
-│   └── new-ngo.sh             Skript: Configs aus Templates für neue NGO ableiten
-├── tests/                     Geteilte Pytest-Hilfen + Fixtures
-├── .env.example               Vorlage für API-Keys
-├── .gitlab-ci.yml             CI-Pipeline (Smoke + Test)
-├── install.sh                 Idempotenter Installer
-└── requirements.txt           Top-Level-Dependencies
+│   ├── _shared/               HTTP client, logging, config loader
+│   ├── adapters/esp/          ESP/CRM adapters (swap with one env var)
+│   │   ├── _interface.py      Abstract contract
+│   │   ├── brevo.py           Full implementation
+│   │   ├── mailchimp.py       Stub — contribute via PR
+│   │   ├── mailerlite.py      Stub (popular with small EU NGOs)
+│   │   ├── activecampaign.py  Stub
+│   │   └── civicrm.py         Stub — open-source nonprofit CRM
+│   ├── journalisten-crawler/  Press contact crawler (49 tests)
+│   ├── politik-connector/     Abgeordnetenwatch + Bundestag API
+│   ├── brevo-sync/            CSV → ESP sync CLI
+│   ├── themen-monitor/        Topic + crisis + alliance monitor
+│   └── impact-story-builder/  Beneficiary story structuring
+├── configs/
+│   ├── ngo.example.yaml       Top-level config (name, topics, brand)
+│   ├── sources.example.yaml   Source lists (media, politics, funders)
+│   └── brevo.example.yaml     List and field mapping
+├── .github/workflows/
+│   ├── ci.yml                 Test suite on push
+│   └── daily-monitor.yml      Scheduled topic monitor (runs at 06:00 UTC)
+└── .env.example               API key template
 ```
 
-## Tool-Reihenfolge im Workflow
-
-```
-┌────────────────────────┐    ┌────────────────────┐    ┌────────────┐
-│ journalisten-crawler   │    │                    │    │            │
-│  Output: contacts.csv  │───▶│   brevo-sync       │───▶│   Brevo    │
-└────────────────────────┘    │   CSV → Listen     │    │   Listen   │
-┌────────────────────────┐    │   Tags + Custom-   │    └────────────┘
-│ politik-connector      │───▶│   Fields           │           │
-│  Output: contacts.csv  │    │                    │           │
-└────────────────────────┘    └────────────────────┘           │
-                                                                ▼
-                                                       ┌─────────────────┐
-                                                       │ Newsletter,     │
-                                                       │ Storytelling,   │
-                                                       │ Politiker-Mails │
-                                                       └─────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────┐
-│ themen-monitor (eigenständig)                                       │
-│   Pollt: News, Allianzen, Politik, Förderer, Social, Krisen         │
-│   Output: täglicher HTML-Report → E-Mail an Comms-Team              │
-└─────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────┐
-│ impact-story-builder (manuell aufgerufen)                           │
-│   Input: YAML mit Beneficiary-Daten                                 │
-│   Output: Markdown-Story + Brevo-Template                           │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-## Setup (lokal)
+### Setup
 
 ```bash
-git clone <dein-fork> ngo-stakeholder-stack
+git clone https://github.com/philip95macdonald-cmd/ngo-stakeholder-stack
 cd ngo-stakeholder-stack
 bash install.sh --with-deps
 cp .env.example .env && $EDITOR .env
@@ -79,40 +82,41 @@ cp configs/ngo.example.yaml configs/ngo.yaml && $EDITOR configs/ngo.yaml
 bash scripts/smoke.sh
 ```
 
-Wenn der Smoketest grün ist, ist der Stack einsatzbereit. Detaillierte
-Schritt-für-Schritt-Anleitung in [`QUICKSTART.md`](QUICKSTART.md).
+When `smoke.sh` exits green, the stack is ready. Each tool has its own README with step-by-step instructions.
 
-## Constraints und Defaults
+### ESP adapter pattern
 
-- **Sprache:** Python 3.10+
-- **Lizenz:** MIT (Default — anpassbar)
-- **DSGVO:** Doppel-Opt-In, granulare Consent-Tags, Audit-Log auf allen Schreib-Operationen
-- **Open-Source-First:** vor Eigenbau prüfen, ob CiviCRM, Mautic, openPetition o.ä. die Aufgabe lösen
-- **Keine generierten Beneficiary-Quotes** — Storytelling-Builder ist Strukturierungs-, kein Erzeugungs-Tool
-- **Keine Crawls auf Spender-Daten** — Spender kommen nur aus eigenen Spendenformen
+Switch contact destination by setting `ESP_PROVIDER` in `.env`:
 
-## Status der Komponenten
+```bash
+ESP_PROVIDER=brevo          # default
+ESP_PROVIDER=mailerlite     # good free plan, EU data residency
+ESP_PROVIDER=civicrm        # if your NGO already runs CiviCRM
+```
 
-| Komponente | Status | Quelle |
-|---|---|---|
-| `_shared` | Skeleton | neu für diese Vorlage |
-| `journalisten-crawler` | Skeleton mit Beispiel-Modulen | erprobt in der Praxis |
-| `politik-connector` | Funktionsfähiger Skeleton mit Abgeordnetenwatch-Adapter | neu |
-| `brevo-sync` | CLI + List-/Sync-Skeleton | adaptiert |
-| `themen-monitor` | Skeleton mit Source-Stubs | erprobt in der Praxis |
-| `impact-story-builder` | Voll funktionsfähig (Markdown-Output) | neu |
+Each adapter implements the same 3-method interface (`upsert_contact`, `ensure_fields`, `list_lists`). To add a new provider, copy any stub and fill in the three methods.
 
-"Skeleton" heißt: Architektur steht, Schlüssel-Funktionen sind implementiert,
-Tests-Hülle existiert, manuelle End-to-End-Tests laufen. Produktive
-Härtung (Error-Handling, Retry-Logic, vollständige Test-Coverage) ist
-Aufgabe der nächsten Iteration.
+### Automated monitoring (GitHub Actions)
 
-## Nächste Schritte
+`.github/workflows/daily-monitor.yml` runs the topic monitor at 06:00 UTC every day and emails the digest to your comms team. No server required — runs on GitHub's free tier.
 
-1. **Phase 0 (3–5 Tage):** Config-Werte für deine NGO setzen (`configs/ngo.yaml`), Bravo-Listen anlegen
-2. **Phase 1 (3–5 Tage):** Stakeholder-Tag-Schema in `configs/brevo.yaml` verfeinern
-3. **Phase 2 (5–7 Tage):** Politik-Connector aktivieren, erste Live-Daten aus Abgeordnetenwatch ziehen
-4. **Phase 3 (5–7 Tage):** Themen-Monitor-Quellen anpassen (Allianzen, Förderer, Themen-Feeds)
-5. **Phase 4 (3–5 Tage):** Compliance-Dokumentation, Verzeichnis von Verarbeitungstätigkeiten
+To activate: add `MONITOR_EMAIL` and your SMTP credentials as GitHub Actions secrets.
 
-Schätzung MVP: 19–28 Tage Vollzeit-Engineering.
+### Stack
+
+| Layer | Technology |
+|---|---|
+| Language | Python 3.10+ |
+| Crawling | Playwright (JS-rendered pages), requests |
+| NLP | spaCy (NER for contact extraction) |
+| ESP/CRM | Brevo, MailerLite, CiviCRM (via adapter) |
+| CI/CD | GitHub Actions |
+| Compliance | GDPR-compliant by default — consent timestamps, suppression-list respected |
+
+### Contributing
+
+The stub adapters (Mailchimp, MailerLite, ActiveCampaign, CiviCRM) are the easiest entry points. Each one is ~30 lines. See `tools/adapters/esp/_interface.py` for the contract.
+
+## License
+
+MIT
