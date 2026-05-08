@@ -1,0 +1,74 @@
+# Brevo-spezifische Konfiguration
+# Listen-IDs und Field-Mapping. Listen muessen vorher in Brevo angelegt sein,
+# IDs hier eintragen.
+
+brevo:
+  api_base: "https://api.brevo.com/v3"
+  api_key_env: "BREVO_API_KEY"   # Variablenname in .env
+
+  # Listen pro Stakeholder-Gruppe
+  lists:
+    journalisten_de: 1            # ID aus Brevo
+    journalisten_eu: 2
+    politik_bundestag: 3
+    politik_landtage: 4
+    politik_eu: 5
+    wissenschaft: 6
+    allianzen: 7
+    spender_active: 8
+    spender_lapsed: 9
+    petitionen_general: 10
+    newsletter_general: 11
+    foerderer: 12
+
+  # Custom-Fields die in Brevo angelegt sein muessen
+  custom_fields:
+    - name: "MEDIUM"              # bei Journalisten
+      type: "text"
+    - name: "ROLE"
+      type: "text"
+    - name: "PARTY"               # bei Politikern
+      type: "text"
+    - name: "PARLIAMENT"
+      type: "text"
+    - name: "CONSTITUENCY"        # Wahlkreis
+      type: "text"
+    - name: "COMMITTEES"          # Pipe-separierte Liste
+      type: "text"
+    - name: "PARLIAMENT_ID"
+      type: "number"
+    - name: "TOTAL_DONATIONS_EUR" # bei Spendern
+      type: "number"
+    - name: "LAST_DONATION_DATE"
+      type: "date"
+    - name: "SOURCE_URL"
+      type: "text"
+    - name: "CONFIDENCE"
+      type: "float"
+
+  # Tag-Konvention — zentrale Stelle fuer Konsistenz
+  tags:
+    stakeholder_prefix: "stakeholder:"
+    topic_prefix: "topic:"
+    region_prefix: "region:"
+    consent_prefix: "consent:"
+    party_prefix: "party:"
+    parliament_prefix: "parliament:"
+
+  # Welche Custom-Fields werden welchem Stakeholder-Typ zugeordnet
+  field_mapping:
+    journalist:
+      required: ["MEDIUM", "ROLE", "SOURCE_URL", "CONFIDENCE"]
+      optional: []
+    politiker:
+      required: ["PARTY", "PARLIAMENT", "PARLIAMENT_ID", "SOURCE_URL"]
+      optional: ["CONSTITUENCY", "COMMITTEES"]
+    spender:
+      required: ["TOTAL_DONATIONS_EUR", "LAST_DONATION_DATE"]
+      optional: []
+
+  # Suppression-Liste wird IMMER respektiert — niemals ueberschreiben
+  respect_global_suppression: true
+
+  # Idempotenz: E-Mail = Schluessel. Bei Konflikt nicht ueberschreiben sondern updaten.
+  conflict_resolution: "update"   # update | skip | error

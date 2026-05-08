@@ -1,0 +1,68 @@
+# GitLab CI fuer den NGO Stakeholder Stack.
+# Stages: smoke (Imports + Sanity), test (pytest)
+
+stages:
+  - smoke
+  - test
+
+default:
+  image: python:3.12-slim
+  before_script:
+    - python --version
+    - pip install --quiet --upgrade pip
+    - pip install --quiet -r requirements.txt
+
+# ─── Smoke-Stage ─────────────────────────────────────────────────────────
+
+smoke:journalisten-crawler:
+  stage: smoke
+  script:
+    - cd tools/journalisten-crawler
+    - pip install --quiet -r requirements.txt
+    - python -c "from config_loader import load_config; print('✓ journalisten-crawler imports')"
+
+smoke:politik-connector:
+  stage: smoke
+  script:
+    - cd tools/politik-connector
+    - pip install --quiet -r requirements.txt
+    - python -c "import abgeordnetenwatch, main; print('✓ politik-connector imports')"
+
+smoke:brevo-sync:
+  stage: smoke
+  script:
+    - cd tools/brevo-sync
+    - pip install --quiet -r requirements.txt
+    - BREVO_API_KEY=ci-smoke-dummy python -c "import sync; print('✓ brevo-sync imports')"
+    - BREVO_API_KEY=ci-smoke-dummy python sync.py --help
+
+smoke:themen-monitor:
+  stage: smoke
+  script:
+    - cd tools/themen-monitor
+    - pip install --quiet -r requirements.txt
+    - python -c "import main, analyzer; print('✓ themen-monitor imports')"
+
+smoke:impact-story-builder:
+  stage: smoke
+  script:
+    - cd tools/impact-story-builder
+    - python -c "import builder; print('✓ impact-story-builder imports')"
+    - python builder.py --self-test
+
+# ─── Test-Stage ──────────────────────────────────────────────────────────
+
+test:politik-connector:
+  stage: test
+  needs: ["smoke:politik-connector"]
+  script:
+    - cd tools/politik-connector
+    - pip install --quiet -r requirements.txt
+    - python -m pytest tests/ -v --tb=short
+
+test:impact-story-builder:
+  stage: test
+  needs: ["smoke:impact-story-builder"]
+  script:
+    - cd tools/impact-story-builder
+    - python -m pytest tests/ -v --tb=short

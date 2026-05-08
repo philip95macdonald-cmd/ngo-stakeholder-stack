@@ -1,0 +1,220 @@
+# Quellen-Listen fuer Crawler und Themen-Monitor.
+# Keine Geheimnisse hier — diese Datei kann und soll committet werden.
+#
+# Anleitung: Kommentare lesen, irrelevante Domains loeschen,
+# eigene hinzufuegen. Die Liste ist nach Themen-Schwerpunkten gegliedert.
+
+# ─── Journalisten-Crawler: Domains für Pressekontakt-Recherche ───────────────
+#
+# Empfehlung: 30–60 Domains fuer den Start. Den Crawler einmal laufen
+# lassen, Kontakte in Brevo laden, dann die Liste scharf stellen.
+#
+journalisten:
+
+  # ── Allgemeine Nachrichtenmedien (DE) ──────────────────────────────────────
+  domains_de:
+    # Reichweitenstarke Leitmedien
+    - "spiegel.de"
+    - "zeit.de"
+    - "sueddeutsche.de"
+    - "faz.net"
+    - "welt.de"
+    - "focus.de"
+    - "stern.de"
+    - "fr.de"              # Frankfurter Rundschau
+    - "tagesspiegel.de"
+    - "rnd.de"             # RedaktionsNetzwerk Deutschland (150+ Regionalzeitungen)
+
+    # Oeffentlich-rechtlich
+    - "tagesschau.de"
+    - "zdf.de"
+    - "deutschlandfunk.de"
+    - "dw.com"
+
+    # Regionale ARD-Anstalten (nach Bedarf aktivieren)
+    - "ndr.de"
+    - "wdr.de"
+    - "br.de"
+    - "mdr.de"
+    - "swr.de"
+    - "rbb24.de"
+    - "hessenschau.de"
+
+    # Investigativ & NGO-nah
+    - "correctiv.org"
+    - "netzpolitik.org"
+    - "lobbycontrol.de"
+
+    # Klima & Umwelt
+    - "klimareporter.de"
+    - "nabu.de"            # NABU-Pressestelle
+    - "bund.net"           # BUND-Pressestelle
+
+    # Soziales, Migration & Wohlfahrt
+    - "proasyl.de"
+    - "caritas.de"
+    - "diakonie.de"
+    - "paritaet.org"
+    - "awobundesverband.de"
+
+    # Menschenrechte & Zivilgesellschaft
+    - "amnesty.de"
+    - "hrw.org"            # Human Rights Watch
+    - "transparency.de"
+
+    # Bildung & Wissenschaft
+    - "bpb.de"             # Bundeszentrale fuer politische Bildung
+    - "wissenschaft.de"
+
+    # Wirtschaft & Verbraucherschutz
+    - "boeckler.de"        # Hans-Boeckler-Stiftung
+    - "vzbv.de"            # Verbraucherzentrale Bundesverband
+
+  # ── EU-Medien ──────────────────────────────────────────────────────────────
+  domains_eu:
+    - "euractiv.com"
+    - "politico.eu"
+    - "euobserver.com"
+    - "social-europe.eu"
+    - "euroactiv.de"       # deutsche Ausgabe
+
+  cap_per_domain: 50
+  rate_limit_seconds: 1.0
+  user_agent: "ngo-stakeholder-stack-crawler/0.1 (+https://beispiel-ngo.org/bot)"
+  respect_robots_txt: true
+  follow_publisher_groups: true
+
+  # Domains, die JavaScript-Rendering (Playwright) benoetigen
+  # Playwright installieren: pip install playwright && playwright install chromium
+  js_domains: []
+
+  # Verlags-Gruppen fuer Deduplication
+  # Mehrere Marken eines Verlags → ein kanonischer Kontakt
+  publisher_groups:
+    - canonical: "spiegel.de"
+      members: ["spiegel.de", "spiegel-online.de", "manager-magazin.de"]
+    - canonical: "zeit.de"
+      members: ["zeit.de", "zeit-online.de", "ze.tt"]
+    - canonical: "sueddeutsche.de"
+      members: ["sueddeutsche.de", "sz.de", "jetzt.de"]
+    - canonical: "faz.net"
+      members: ["faz.net", "faznet.de", "faz-net.de"]
+    - canonical: "welt.de"
+      members: ["welt.de", "nwzonline.de", "hamburger-abendblatt.de", "bz-berlin.de"]
+    - canonical: "rnd.de"
+      members: ["rnd.de", "haz.de", "maz-online.de", "lvz.de", "kn-online.de",
+                "op-online.de", "noz.de"]
+
+# ─── Politik-Connector: Parlamente & Filter ──────────────────────────────────
+politik:
+  parliaments:
+    - id: 161          # Bundestag 20. Wahlperiode — ID bei Wahl aktualisieren
+      label: "Bundestag"
+      active: true
+    # Weitere Landtage: IDs auf abgeordnetenwatch.de/api/v2/parliaments ermitteln
+    # - id: 153
+    #   label: "Landtag BW"
+    #   active: false
+  include_only_with_email: true
+  rate_limit_per_minute: 100
+  api_base: "https://www.abgeordnetenwatch.de/api/v2"
+
+# ─── Themen-Monitor ──────────────────────────────────────────────────────────
+themen_monitor:
+  schedule: "07:00"   # lokale Uhrzeit; GitHub-Action laeuft 7 Uhr MEZ
+
+  # ── Google News (kein API-Key noetig) ──────────────────────────────────────
+  google_news:
+    keywords:
+      - "klimaschutz Deutschland"
+      - "energiewende Bundestag"
+      - "Beispiel NGO"      # ← eigenen NGO-Namen eintragen (Brand-Mention-Alert)
+      # Weitere Themen-Keywords hier:
+      # - "Klimageld"
+      # - "CO2-Preis"
+
+  # ── Themen-Medien via RSS ──────────────────────────────────────────────────
+  # Diese Feeds werden taeglich gelesen, unabhaengig von Keywords.
+  topic_media:
+    - name: "klimareporter"
+      rss: "https://www.klimareporter.de/rss"
+    - name: "taz Klima"
+      rss: "https://taz.de/Klima/!t5008/feed/"
+    - name: "Deutschlandfunk Umwelt"
+      rss: "https://www.deutschlandfunk.de/umwelt-und-natur.1696.de.rss"
+    - name: "NABU Aktuell"
+      rss: "https://www.nabu.de/news/rss.xml"
+    - name: "BUND Presse"
+      rss: "https://www.bund.net/service/presse/pressemitteilungen/rss/"
+    # Weitere nach Themenfeld der NGO ergaenzen:
+    # - name: "Pro Asyl"
+    #   rss: "https://www.proasyl.de/feed/"
+    # - name: "Boeckler Impuls"
+    #   rss: "https://www.boeckler.de/de/rss-feed-boeckler.htm"
+
+  # ── Allianz-Monitor ────────────────────────────────────────────────────────
+  # Was machen Partner-NGOs gerade? Wird via RSS und Sitemap-Fallback gelesen.
+  alliance_partners:
+    - name: "BUND"
+      domain: "bund.net"
+    - name: "Klima-Allianz Deutschland"
+      domain: "klima-allianz.de"
+    - name: "Germanwatch"
+      domain: "germanwatch.org"
+    - name: "NABU"
+      domain: "nabu.de"
+    - name: "WWF Deutschland"
+      domain: "wwf.de"
+    # Eigene Allianzpartner ergaenzen:
+    # - name: "Mein Netzwerk e.V."
+    #   domain: "mein-netzwerk.de"
+
+  # ── Foerder-Watch ──────────────────────────────────────────────────────────
+  funding_sources:
+    - name: "DSEE"
+      url: "https://www.deutsche-stiftung-fuer-engagement-und-ehrenamt.de/foerderung/"
+    - name: "EU Funding Portal"
+      url: "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/home"
+    - name: "Bundesverband Dt. Stiftungen"
+      url: "https://www.stiftungen.org/stiftungen/foerderangebote.html"
+    - name: "BMZ Foerderung"
+      url: "https://www.bmz.de/de/aktuelles/foerdermoeglichkeiten"
+
+  # ── Politik-Themen-Watch ───────────────────────────────────────────────────
+  politik_themen:
+    bundestag_keywords:
+      - "Klimaschutzgesetz"
+      - "Erneuerbare-Energien-Gesetz"
+      # - "Migrationspolitik"
+      # - "Buergergeld"
+
+  # ── Social Media ───────────────────────────────────────────────────────────
+  social:
+    # Twitter/X: nur aktiv wenn TWITTER_BEARER_TOKEN in .env gesetzt
+    twitter_keywords:
+      - "klimaschutz"
+      - "Beispiel NGO"
+
+    youtube_channels: []   # YouTube-Channel-IDs eintragen (z.B. UCxxxxx)
+
+    # Reddit: anonym, kein Token noetig
+    reddit_subreddits:
+      - "Umweltschutz"
+      - "de"               # mit Keyword-Filter aus google_news.keywords
+
+    # Mastodon: kein Token noetig fuer Public-Posts
+    mastodon_instances:
+      - "https://climatejustice.social"
+      - "https://mastodon.social"
+
+    bluesky_handles: []    # z.B. ["meine-ngo.bsky.social"]
+
+  # ── Krisen-Detektor ────────────────────────────────────────────────────────
+  crisis_detector:
+    enabled: true
+    volume_spike_factor: 3.0       # Alert wenn >3x Median-Tagesvolumen
+    sentiment_drift_zscore: 1.5    # Alert wenn Sentiment >1.5 Sigma unter Baseline
+    history_days: 30
+    alert_channels:
+      - email                      # nutzt SMTP_* aus .env
+      # - slack                    # aktivieren wenn SLACK_WEBHOOK_URL gesetzt

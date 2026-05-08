@@ -1,0 +1,17 @@
+# Top-Level Dependencies — werden von install.sh in venv installiert
+# Pro Tool gibt es zusätzlich eigene requirements.txt für Spezial-Deps.
+
+# Core
+requests>=2.31.0
+pyyaml>=6.0
+python-dotenv>=1.0.0
+
+# CLI
+click>=8.1.0
+
+# Test
+pytest>=7.4.0
+pytest-mock>=3.11.1
+
+# Logging / Observability
+structlog>=23.1.0

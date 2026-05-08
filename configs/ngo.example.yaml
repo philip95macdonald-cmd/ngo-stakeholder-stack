@@ -1,0 +1,56 @@
+# NGO-spezifische Stamm-Konfiguration
+# Wird von allen Tools über tools/_shared/config_loader.py geladen.
+
+ngo:
+  name: "Beispiel NGO e.V."
+  legal_name: "Beispiel NGO eingetragener Verein"
+  domain: "beispiel-ngo.org"
+  legal_form: "e.V."           # e.V. | gGmbH | Stiftung | gAG
+  founded_year: 2015
+
+  # Steuerlich anerkannt? Pflicht für Spendenbescheinigungen.
+  charitable_status: true
+  finanzamt: "Karlsruhe-Stadt"
+  steuernummer: "00/000/00000"
+
+  # Themen — werden für Crawler-Keywords, Themen-Monitor und Story-Tagging genutzt.
+  themes:
+    - klimaschutz
+    - energiewende
+    - mobilitaetswende
+
+  # Regionen — bestimmt Politik-Connector-Filter (Bundestag + Landtag-XX + EU)
+  regions:
+    - "DE"
+    - "EU"
+  laender:
+    - "BW"   # Baden-Württemberg, hier ein Schwerpunkt
+    - "NRW"
+
+  # Brand-Defaults für Storytelling-Builder und Brevo-Templates
+  brand:
+    primary_color: "#00A86B"
+    secondary_color: "#1a1a1a"
+    tone: "informal"           # formal | informal
+    salutation: "Du"           # Du | Sie
+    signature: |
+      Vielen Dank für deine Unterstützung,
+      das Beispiel-NGO-Team
+
+# Datenschutz-Defaults
+datenschutz:
+  retention_days_inactive: 730   # 24 Monate
+  consent_double_optin: true
+  audit_log_enabled: true
+  audit_log_retention_months: 36
+
+# Lobbyregister-Schwellwert (DE: 50 000 EUR p.a.)
+lobby:
+  register_de: false              # auf true sobald Schwellwert erreicht
+  lobbyregister_id: ""            # nach Eintragung hier hinterlegen
+  eu_transparency_register_id: ""
+
+# Top-Level-Output
+output:
+  dir: "./output"
+  log_level: "INFO"

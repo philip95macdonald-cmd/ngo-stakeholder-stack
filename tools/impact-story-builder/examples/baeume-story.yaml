@@ -1,0 +1,32 @@
+headline: "1.873 Bäume — und ein Wald, der zurückkommt"
+
+output:
+  metric: "1.873 Bäume gepflanzt im Aufforstungs-Projekt 2026"
+  qualitative: |
+    Ich war 12 Jahre alt, als der Wald gerodet wurde. Heute pflanze ich
+    mit meinen eigenen Kindern dort wieder Bäume. Wir sind nicht nur
+    Hilfsempfänger — wir sind Teil der Lösung.
+    — Sarah K., 34, Anwohnerin und Helferin
+  source: "Forstamt-Bestätigung 2026-03-15, Aktenzeichen 442-2026"
+
+outcome:
+  metric: "Bodenfeuchtigkeit auf 38 % gestiegen (Mai 2025: 22 %)"
+  qualitative: |
+    Die Sensoren zeigen es klar: Der Boden hält wieder Wasser. Das hat
+    direkten Effekt auf die Vegetation in der gesamten Region.
+    — Dr. Markus Weber, Bodenkundler Universität Freiburg
+  source: "Messdaten Sensor-Station 7B, Frühjahrs-Report 2026"
+
+impact:
+  metric: "Erste Rückkehr von 4 Reh-Familien dokumentiert"
+  qualitative: |
+    Wir haben in diesem Frühling die ersten Reh-Familien seit zehn Jahren
+    wieder im Gebiet gesehen. Das ist mehr als nur ein Symbol — das ist
+    der Beweis, dass das Ökosystem heilt.
+    — Naturschutzbund Ortsgruppe Schwarzwald, Beobachtungs-Bericht
+  source: "Wildtier-Monitoring Frühling 2026, Naturschutzbund"
+
+cta: |
+  Hilf dem Wald weiter wachsen. Eine Spende von 5 € pflanzt einen
+  weiteren Baum. Eine Spende von 25 € pflanzt einen ganzen Quadratmeter
+  zurückgewonnenes Ökosystem.

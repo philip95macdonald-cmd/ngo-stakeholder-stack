@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install \
+            -r requirements.txt \
+            -r tools/journalisten-crawler/requirements.txt \
+            -r tools/politik-connector/requirements.txt \
+            -r tools/themen-monitor/requirements.txt \
+            -r tools/impact-story-builder/requirements.txt
+
+      - name: Smoke-Test (alle Tools, Mock-Modus)
+        run: bash scripts/smoke.sh
+
+      - name: Pytest — journalisten-crawler (49 Tests)
+        run: |
+          cd tools/journalisten-crawler
+          python -m pytest tests/ -v --tb=short
+
+      - name: Pytest — politik-connector
+        run: |
+          cd tools/politik-connector
+          python -m pytest tests/ -v --tb=short
+
+      - name: Pytest — impact-story-builder
+        run: |
+          cd tools/impact-story-builder
+          python -m pytest tests/ -v --tb=short

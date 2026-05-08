@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+output/
+logs/
+.DS_Store
+.pytest_cache/
+*.swp
+# configs/*.yaml sind KEIN Secret und sollten committet werden.
+# Nur .env enthaelt API-Keys und ist gitignored.

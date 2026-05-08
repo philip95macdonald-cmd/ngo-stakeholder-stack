@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /intern/
+Crawl-delay: 2
+
+User-agent: ngo-stakeholder-stack-crawler/0.1
+Allow: /presse/
+Allow: /kontakt/
+Allow: /impressum
+Disallow: /admin/
