@@ -5,20 +5,11 @@
 # NGO Stakeholder Stack
 
 Open-source Python toolkit for NGO press and stakeholder communication.
-Replaces ~80% of a Meltwater or Cision subscription at zero recurring cost.
+Zero recurring cost — runs entirely on free tiers and self-hosted infrastructure.
 
 ---
 
 ## For NGO decision-makers
-
-### What it replaces
-
-| Tool | Typical cost | This stack |
-|---|---|---|
-| Meltwater (monitoring + media DB) | ~€500/month | €0 |
-| Cision (press database) | ~€300/month | €0 |
-| Brevo/Mailchimp (contacts + email) | €0–50/month | €0 (free tiers) |
-| **Total** | **~€800+/month** | **€0** |
 
 ### What it does
 
